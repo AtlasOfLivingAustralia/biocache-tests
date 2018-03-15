@@ -25,6 +25,8 @@ import spock.lang.Specification
  */
 class OcurrenceSearchTest extends Specification {
     //TODO externalise as config
+
+//    String baseUrl = "https://devt.ala.org.au/biocache-service/ws/"
     String baseUrl = "https://biocache-test.ala.org.au/ws/"
 
     RESTClient restClient = new RESTClient(baseUrl, ContentType.JSON)
@@ -32,21 +34,23 @@ class OcurrenceSearchTest extends Specification {
 
     def "Search all records"() {
         when: "Search All Records"
+//        String queryString = "facets=genus&facets=taxon_name&facets=species"
+        String queryString = "facets="
         def response = restClient.get(
                 path: path,
-                requestContentType: ContentType.JSON
+                queryString: queryString,
         )
 
         then: "Status is 200"
         response.status == 200
 
         and: "Body contains proper values"
-        assert response.data.totalRecords >= 73949280
-        assert response.data.status == "OK"
-        assert response.data.occurrences.size() == 10
-        assert !response.data.facetResults
-        assert response.data.query == "?q=*%3A*"
-        assert response.data.queryTitle == "[all records]"
+        response.data.totalRecords >= 73949280
+        response.data.status == "OK"
+        response.data.occurrences.size() == 10
+        !response.data.facetResults
+        response.data.query == "?q=*%3A*"
+        response.data.queryTitle == "[all records]"
 
     }
 
@@ -61,13 +65,13 @@ class OcurrenceSearchTest extends Specification {
         )
 
         then: "Status is 200"
-        assert response.status == 200
+        response.status == 200
 
         and: "Total records is at least 148019"
-        assert response.data.totalRecords >= 148019
+        response.data.totalRecords >= 148019
 
         and: "Occurrences species on first page are all Macropus"
-        assert response.data.occurrences.findAll {it.scientificName.contains("Macropus")}.size() == response.data.occurrences.size()
+        response.data.occurrences.findAll {it.scientificName.contains("Macropus")}.size() == response.data.occurrences.size()
 
         and: "All genus are Macropus"
         response.data.facetResults.size() == 1
@@ -79,5 +83,53 @@ class OcurrenceSearchTest extends Specification {
         and: "queryTitle is GENUS: Macropus"
         assert response.data.queryTitle == "<span class='lsid' id='urn:lsid:biodiversity.org.au:afd.taxon:b1d9bf29-648f-47e6-8544-2c2fbdf632b1'>GENUS: Macropus</span>"
 
+    }
+
+    def "Text seach Macropus should show all records of genus Macropus and a scattering of other species with the name macropus in them scattered across the kingdoms. There should be Plantae and Fungi amongst them"() {
+
+        String queryString = "q=text%3AMacropus&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name&facets=genus&facets=kingdom"
+        when: "Search Text Macropus"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                requestContentType: ContentType.JSON
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "Total records is at least 266109"
+        response.data.totalRecords >= 266109
+
+        and: "Some occurrences species on first page are macropus"
+        response.data.occurrences.findAll {it.scientificName?.toLowerCase()?.contains("macropus")}.size() > 0
+
+        and: "Has several 4 Kingdoms"
+        def kingdomFacet = response.data.facetResults.find {it.fieldName == "kingdom"}?.fieldResult
+        kingdomFacet != null
+        kingdomFacet.size() == 4
+
+        and: "Contains kingdom Animalia"
+        def animaliaKingdom = kingdomFacet.find {it.label == "Animalia"}
+        animaliaKingdom != null
+        animaliaKingdom.count >= 264515
+
+        and: "also has some  Fungi kingdom"
+        def fungiKingdom = kingdomFacet.find {it.label == "Fungi"}
+        fungiKingdom != null
+        fungiKingdom.count >= 10
+
+        and: "also has some  Plantae kingdom"
+        def plantaeKingdom = kingdomFacet.find {it.label == "Plantae"}
+        plantaeKingdom != null
+        plantaeKingdom.count >= 327
+
+        and: "the remaining kingdom is unknown"
+        def unknownKingdom = kingdomFacet.find {it.label == ""}
+        unknownKingdom != null
+        unknownKingdom.count >= 1257
+
+        and: "queryTitle is text:Macropus"
+        response.data.queryTitle == "text:Macropus"
     }
 }
