@@ -25,7 +25,6 @@ import spock.lang.Specification
  */
 class OcurrenceSearchTest extends Specification {
     //TODO externalise as config
-
 //    String baseUrl = "https://devt.ala.org.au/biocache-service/ws/"
     String baseUrl = "https://biocache-test.ala.org.au/ws/"
 
@@ -34,7 +33,6 @@ class OcurrenceSearchTest extends Specification {
 
     def "Search all records"() {
         when: "Search All Records"
-//        String queryString = "facets=genus&facets=taxon_name&facets=species"
         String queryString = "facets="
         def response = restClient.get(
                 path: path,
@@ -60,8 +58,7 @@ class OcurrenceSearchTest extends Specification {
         when: "Search Taxon Macropus"
         def response = restClient.get(
                 path: path,
-                queryString: queryString,
-                requestContentType: ContentType.JSON
+                queryString: queryString
         )
 
         then: "Status is 200"
@@ -91,8 +88,7 @@ class OcurrenceSearchTest extends Specification {
         when: "Search Text Macropus"
         def response = restClient.get(
                 path: path,
-                queryString: queryString,
-                requestContentType: ContentType.JSON
+                queryString: queryString
         )
 
         then: "Status is 200"

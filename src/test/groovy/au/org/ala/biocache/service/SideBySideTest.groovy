@@ -1,0 +1,75 @@
+/*
+ * Copyright (C) 2018 Atlas of Living Australia
+ * All Rights Reserved.
+ *
+ * The contents of this file are subject to the Mozilla Public
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ */
+package au.org.ala.biocache.service
+
+import au.org.ala.biocache.SpreadSheetUtil
+import groovyx.net.http.ContentType
+import groovyx.net.http.RESTClient
+import spock.lang.Shared
+import spock.lang.Specification
+import spock.lang.Unroll
+
+/**
+ * Consumes a spreadsheet and query the webservice for each
+ * row comparing that reference and test system generate the same output
+ *
+ * It is assumed that each request is idempotent at least to a granularity of a few seconds otherwise the
+ * comparisson would not make sense
+ * @author "Javier Molina <javier-molina at GH>"
+ */
+class SideBySideTest extends Specification {
+    //TODO externalise as config
+    String referenceUrl = "https://biocache-test.ala.org.au/ws/"
+    String testUrl = "https://devt.ala.org.au/biocache-service/ws/"
+
+    RESTClient referenceRestClient = new RESTClient(referenceUrl, ContentType.JSON)
+    RESTClient testRestClient = new RESTClient(testUrl, ContentType.JSON)
+
+
+//    String path = "/occurrences/search"
+    @Shared
+    SpreadSheetUtil spreadSheetUtil = new SpreadSheetUtil()
+
+    @Unroll
+    def "Compare each call for #description"() {
+        when: "Query both systems"
+//        String queryString = "facets="
+
+        def referenceResponse = referenceRestClient.get(
+                path: path,
+                queryString: queryString,
+        )
+
+        def testResponse = testRestClient.get(
+                path: path,
+                queryString: queryString,
+        )
+
+        then: "Status is 200 for both responses"
+        referenceResponse.status == 200
+        testResponse.status == 200
+
+        and: "Data is equal for both systems"
+        referenceResponse.data == testResponse.data
+
+        where:
+        row << spreadSheetUtil.getFirstSheetFromResource("/side_by_side_tests.xlsx")
+        data = spreadSheetUtil.getRowData(row)
+        description = data[0]
+        path = data[1]
+        queryString = data[2]
+
+    }
+}
