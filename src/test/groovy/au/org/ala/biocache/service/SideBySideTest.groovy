@@ -14,8 +14,8 @@
  */
 package au.org.ala.biocache.service
 
+import au.org.ala.biocache.ContentTypeUtil
 import au.org.ala.biocache.SpreadSheetUtil
-import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import spock.lang.Shared
 import spock.lang.Specification
@@ -31,30 +31,37 @@ import spock.lang.Unroll
  */
 class SideBySideTest extends Specification {
     //TODO externalise as config
+    // Reference system
     String referenceUrl = "https://biocache-test.ala.org.au/ws/"
+    // System under test
     String testUrl = "https://devt.ala.org.au/biocache-service/ws/"
 
-    RESTClient referenceRestClient = new RESTClient(referenceUrl, ContentType.JSON)
-    RESTClient testRestClient = new RESTClient(testUrl, ContentType.JSON)
+    RESTClient referenceRestClient = new RESTClient(referenceUrl)
+    RESTClient testRestClient = new RESTClient(testUrl)
 
-
-//    String path = "/occurrences/search"
     @Shared
     SpreadSheetUtil spreadSheetUtil = new SpreadSheetUtil()
 
     @Unroll
     def "Compare each call for #description"() {
         when: "Query both systems"
-//        String queryString = "facets="
+        Map<String, ?> referenceRequestParams =
+                [path: path,
+                 queryString: queryString]
+
+        if(contentType) {
+            referenceRequestParams.contentType = contentType
+        }
+
+        // the get call below modifies the original map hence we need to keep a copy for the seconnd call
+        Map<String, ?> testRequestParameters = referenceRequestParams.clone()
 
         def referenceResponse = referenceRestClient.get(
-                path: path,
-                queryString: queryString,
+                referenceRequestParams
         )
 
         def testResponse = testRestClient.get(
-                path: path,
-                queryString: queryString,
+                testRequestParameters
         )
 
         then: "Status is 200 for both responses"
@@ -62,14 +69,19 @@ class SideBySideTest extends Specification {
         testResponse.status == 200
 
         and: "Data is equal for both systems"
-        referenceResponse.data == testResponse.data
+        if(referenceResponse.data instanceof InputStream) {
+            referenceResponse.data.getBytes() == testResponse.data.getBytes()
+        } else {
+            referenceResponse.data == testResponse.data
+        }
 
         where:
         row << spreadSheetUtil.getFirstSheetFromResource("/side_by_side_tests.xlsx")
         data = spreadSheetUtil.getRowData(row)
         description = data[0]
-        path = data[1]
-        queryString = data[2]
+        contentType = ContentTypeUtil.contentTypeFromString(data[1]) //Optional parameter in spreadsheet
+        path = data[2]
+        queryString = data[3]
 
     }
 }
