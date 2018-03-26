@@ -15,8 +15,10 @@
 
 package  au.org.ala.biocache.service
 
+import au.org.ala.test.spock.EnvironmentEndPoint
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
@@ -24,12 +26,16 @@ import spock.lang.Specification
  * @author "Javier Molina <javier-molina at GH>"
  */
 class OcurrenceSearchTest extends Specification {
-    //TODO externalise as config
-//    String baseUrl = "https://devt.ala.org.au/biocache-service/ws/"
-    String baseUrl = "https://biocache-test.ala.org.au/ws/"
 
-    RESTClient restClient = new RESTClient(baseUrl, ContentType.JSON)
+    @EnvironmentEndPoint
+    String baseUrl
+
+    RESTClient restClient
     String path = "occurrences/search"
+
+    def setup() {
+        restClient = new RESTClient(baseUrl, ContentType.JSON)
+    }
 
     def "Search all records"() {
         when: "Search All Records"

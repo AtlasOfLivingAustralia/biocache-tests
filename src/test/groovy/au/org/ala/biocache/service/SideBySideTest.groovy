@@ -14,8 +14,9 @@
  */
 package au.org.ala.biocache.service
 
-import au.org.ala.biocache.ContentTypeUtil
-import au.org.ala.biocache.SpreadSheetUtil
+import au.org.ala.test.ContentTypeUtil
+import au.org.ala.test.SpreadSheetUtil
+import au.org.ala.test.spock.EnvironmentEndPoint
 import groovyx.net.http.RESTClient
 import spock.lang.Shared
 import spock.lang.Specification
@@ -30,14 +31,23 @@ import spock.lang.Unroll
  * @author "Javier Molina <javier-molina at GH>"
  */
 class SideBySideTest extends Specification {
-    //TODO externalise as config
-    // Reference system
-    String referenceUrl = "https://biocache-test.ala.org.au/ws/"
-    // System under test
-    String testUrl = "https://devt.ala.org.au/biocache-service/ws/"
 
-    RESTClient referenceRestClient = new RESTClient(referenceUrl)
-    RESTClient testRestClient = new RESTClient(testUrl)
+
+    // System under test
+    @EnvironmentEndPoint
+    String testUrl //= "https://devt.ala.org.au/biocache-service/ws/"
+
+    // Reference system
+    @EnvironmentEndPoint(envVariable = "referenceHostUrl")
+    String referenceUrl //= "https://biocache-test.ala.org.au/ws/"
+
+    RESTClient referenceRestClient
+    RESTClient testRestClient
+
+    def setup() {
+        referenceRestClient = new RESTClient(referenceUrl)
+        testRestClient = new RESTClient(testUrl)
+    }
 
     @Shared
     SpreadSheetUtil spreadSheetUtil = new SpreadSheetUtil()
