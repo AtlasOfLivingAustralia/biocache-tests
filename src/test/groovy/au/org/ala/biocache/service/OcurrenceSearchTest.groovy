@@ -106,7 +106,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Some occurrences species on first page are macropus"
         response.data.occurrences.findAll {it.scientificName?.toLowerCase()?.contains("macropus")}.size() > 0
 
-        and: "Has several 4 Kingdoms"
+        and: "Has 4 Kingdoms"
         def kingdomFacet = response.data.facetResults.find {it.fieldName == "kingdom"}?.fieldResult
         kingdomFacet != null
         kingdomFacet.size() == 4
@@ -133,5 +133,46 @@ class OcurrenceSearchTest extends Specification {
 
         and: "queryTitle is text:Macropus"
         response.data.queryTitle == "text:Macropus"
+    }
+
+    def "Search for Raw/Provided Scientific Name 'Osphranter rufus' should turn up assorted red kangaroos"() {
+
+        String queryString = "q=raw_name%3A%22Osphranter%20rufus%22&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
+        when: "Search for Raw/Provided Scientific Name 'Osphranter rufus'"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "Total records is at least 333"
+        response.data.totalRecords >= 333
+
+        and: "All occurrences species on first page are Osphranter rufus"
+        response.data.occurrences.findAll {it.scientificName?.contains("Osphranter rufus") || it.scientificName?.contains("Macropus")}.size() == response.data.occurrences.size()
+
+        and: "Some occurrences vernacular name on first page are 'Red Kangaroo'"
+        response.data.occurrences.findAll {it.vernacularName?.contains("Red Kangaroo")}.size() > 0
+
+        and: "Has 2 Taxon"
+        def taxonNameFacet = response.data.facetResults.find {it.fieldName == "taxon_name"}?.fieldResult
+        taxonNameFacet != null
+        taxonNameFacet.size() == 2
+
+        and: "Contains taxon Macropus"
+        def animaliaKingdom = taxonNameFacet.find {it.label == "Macropus"}
+        animaliaKingdom != null
+        animaliaKingdom.count >= 91
+
+        and: "also has taxon Osphranter rufus"
+        def fungiKingdom = taxonNameFacet.find {it.label == "Osphranter rufus"}
+        fungiKingdom != null
+        fungiKingdom.count >= 242
+
+
+        and: "queryTitle is raw_name:\"Osphranter rufus\""
+        response.data.queryTitle == "raw_name:\"Osphranter rufus\""
     }
 }
