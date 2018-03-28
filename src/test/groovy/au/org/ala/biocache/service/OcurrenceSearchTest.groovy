@@ -34,6 +34,7 @@ class OcurrenceSearchTest extends Specification {
     String path = "occurrences/search"
 
     def setup() {
+//        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
         restClient = new RESTClient(baseUrl, ContentType.JSON)
     }
 
@@ -73,7 +74,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Total records is at least 148019"
         response.data.totalRecords >= 148019
 
-        and: "Occurrences species on first page are all Macropus"
+        and: "All species occurrences on first page are Macropus"
         response.data.occurrences.findAll {it.scientificName.contains("Macropus")}.size() == response.data.occurrences.size()
 
         and: "All genus are Macropus"
@@ -103,7 +104,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Total records is at least 266109"
         response.data.totalRecords >= 266109
 
-        and: "Some occurrences species on first page are macropus"
+        and: "Some species occurrences on first page are macropus"
         response.data.occurrences.findAll {it.scientificName?.toLowerCase()?.contains("macropus")}.size() > 0
 
         and: "Has 4 Kingdoms"
@@ -150,10 +151,10 @@ class OcurrenceSearchTest extends Specification {
         and: "Total records is at least 333"
         response.data.totalRecords >= 333
 
-        and: "All occurrences species on first page are Osphranter rufus"
+        and: "Some species occurrences on first page are Osphranter rufus"
         response.data.occurrences.findAll {it.scientificName?.contains("Osphranter rufus") || it.scientificName?.contains("Macropus")}.size() == response.data.occurrences.size()
 
-        and: "Some occurrences vernacular name on first page are 'Red Kangaroo'"
+        and: "Some vernacular name occurrences  on first page are 'Red Kangaroo'"
         response.data.occurrences.findAll {it.vernacularName?.contains("Red Kangaroo")}.size() > 0
 
         and: "Has 2 Taxon"
@@ -174,5 +175,40 @@ class OcurrenceSearchTest extends Specification {
 
         and: "queryTitle is raw_name:\"Osphranter rufus\""
         response.data.queryTitle == "raw_name:\"Osphranter rufus\""
+    }
+
+    def "Search for Raw/Provided Scientific Name 'Acacia dealbata' should turn up assorted silver wattles"() {
+
+        String queryString  = "q=raw_name%3A%22Acacia%20dealbata%22&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
+        when: "Search for Raw/Provided Scientific Name 'Osphranter rufus'"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "Total records is at least 25,719"
+        response.data.totalRecords >= 25719
+
+        and: "Some vernacular name occurrences on first page are 'silver wattle'"
+        response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
+
+        and: "Some raw vernacular name occurrences on first page are 'silver wattle'"
+        response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
+
+        and: "Has at least 8 Taxon"
+        def taxonNameFacet = response.data.facetResults.find {it.fieldName == "taxon_name"}?.fieldResult
+        taxonNameFacet != null
+        taxonNameFacet.size() >= 8
+
+        and: "An occurrence of 'Acacia dealbata subsp. dealbata' should be present and linked to the correct taxon ID)"
+        def subspDealbata = taxonNameFacet.find {it.label == "Acacia dealbata subsp. dealbata"}
+        subspDealbata != null
+        subspDealbata.count >= 9877
+
+        and: "queryTitle is raw_name:\"Acacia dealbata\""
+        response.data.queryTitle == "raw_name:\"Acacia dealbata\""
     }
 }
