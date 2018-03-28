@@ -226,4 +226,59 @@ class OcurrenceSearchTest extends Specification {
         and: "queryTitle is raw_name:\"Acacia dealbata\""
         response.data.queryTitle == "raw_name:\"Acacia dealbata\""
     }
+
+    def "Search for species group Mammals should not have any weird kingdoms, phyla or classes floating about"() {
+
+        String queryString  = "q=species_group%3AMammals&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=class&facets=phylum&facets=kingdom&flimit=10"
+
+        when: "Search for species group Mammals"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "Total records is at least 2713131"
+        response.data.totalRecords >= 2713131
+
+        and: "Has 1 kingdom"
+        def kingdomFacet = response.data.facetResults.find {it.fieldName == "kingdom"}?.fieldResult
+        kingdomFacet != null
+        kingdomFacet.size() == 1
+
+        and: "Contains kingdom Animalia"
+        def animaliaKingdom = kingdomFacet.find {it.label == "Animalia"}
+        animaliaKingdom != null
+        animaliaKingdom.count >= 2713131
+
+        and: "Has 1 phylum"
+        def phylumFacet = response.data.facetResults.find {it.fieldName == "phylum"}?.fieldResult
+        phylumFacet != null
+        phylumFacet.size() == 1
+
+        and: "Contains phylum Chordata"
+        def chordataPhylum = phylumFacet.find {it.label == "Chordata"}
+        chordataPhylum != null
+        chordataPhylum.count >= 2713131
+
+        and: "Has 2 classes"
+        def classFacet = response.data.facetResults.find {it.fieldName == "class"}?.fieldResult
+        classFacet != null
+        classFacet.size() == 2
+
+        and: "Contains class Mammalia"
+        def mammaliaClass = classFacet.find {it.label == "Mammalia"}
+        mammaliaClass != null
+        mammaliaClass.count >= 2255099
+
+        and: "the remaining class is unknown"
+        def unknownKingdom = classFacet.find {it.label == ""}
+        unknownKingdom != null
+        unknownKingdom.count >= 458032
+
+        and: "queryTitle is Lifeform:Mammals"
+        response.data.queryTitle == "Lifeform:Mammals"
+    }
 }
