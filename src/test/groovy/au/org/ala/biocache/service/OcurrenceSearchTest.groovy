@@ -151,7 +151,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Total records is at least 333"
         response.data.totalRecords >= 333
 
-        and: "Some species occurrences on first page are Osphranter rufus"
+        and: "All species occurrences on first page are Osphranter rufus"
         response.data.occurrences.findAll {it.scientificName?.contains("Osphranter rufus") || it.scientificName?.contains("Macropus")}.size() == response.data.occurrences.size()
 
         and: "Some vernacular name occurrences  on first page are 'Red Kangaroo'"
@@ -180,7 +180,7 @@ class OcurrenceSearchTest extends Specification {
     def "Search for Raw/Provided Scientific Name 'Acacia dealbata' should turn up assorted silver wattles"() {
 
         String queryString  = "q=raw_name%3A%22Acacia%20dealbata%22&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
-        when: "Search for Raw/Provided Scientific Name 'Osphranter rufus'"
+        when: "Search for Raw/Provided Scientific Name 'Acacia dealbata'"
         def response = restClient.get(
                 path: path,
                 queryString: queryString
@@ -198,12 +198,27 @@ class OcurrenceSearchTest extends Specification {
         and: "Some raw vernacular name occurrences on first page are 'silver wattle'"
         response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
 
+        when: "Drill down on occurrences"
+        def subspDealbataOccurrences = response.data.occurrences.findAll {it.scientificName?.contains("Acacia dealbata subsp. dealbata")}
+        then: "An occurrence of 'Acacia dealbata subsp. dealbata' should be present"
+        subspDealbataOccurrences.size() > 0
+
+        and: "linked to the correct taxon ID"
+        subspDealbataOccurrences.each {
+            String occurrencePath = "occurrence/${it.uuid}"
+            def occurrenceResponse = restClient.get(
+                    path: occurrencePath
+            )
+
+            assert occurrenceResponse.data.processed.classification.taxonConceptID == "http://id.biodiversity.org.au/node/apni/2886432"
+        }
+
         and: "Has at least 8 Taxon"
         def taxonNameFacet = response.data.facetResults.find {it.fieldName == "taxon_name"}?.fieldResult
         taxonNameFacet != null
         taxonNameFacet.size() >= 8
 
-        and: "An occurrence of 'Acacia dealbata subsp. dealbata' should be present and linked to the correct taxon ID)"
+        and: "Contains taxon  'Acacia dealbata subsp. dealbata'"
         def subspDealbata = taxonNameFacet.find {it.label == "Acacia dealbata subsp. dealbata"}
         subspDealbata != null
         subspDealbata.count >= 9877
