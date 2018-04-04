@@ -29,9 +29,19 @@ class ContentTypeUtil {
     static ContentType contentTypeFromString(String input) {
         switch (input) {
             case "application/json":
+            case "application/javascript":
+            case "text/javascript":
                 return ContentType.JSON
             case "application/octet-stream":
                 return ContentType.BINARY
+            case "application/xml":
+            case "text/xml":
+            case "application/xhtml+xml":
+            case "application/atom+xml":
+                return ContentType.XML
+            case "text/plain":
+                return ContentType.TEXT
+
             default:
                 return null
         }
