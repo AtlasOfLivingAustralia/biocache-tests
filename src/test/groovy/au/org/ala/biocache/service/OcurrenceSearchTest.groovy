@@ -41,6 +41,7 @@ class OcurrenceSearchTest extends Specification {
     def setup() {
 //        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
         restClient = new RESTClient(baseUrl, ContentType.JSON)
+        log.info("Test: ${specificationContext.currentIteration.name}")
 
     }
 

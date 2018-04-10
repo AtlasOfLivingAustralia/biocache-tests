@@ -56,6 +56,8 @@ class SideBySideTest extends Specification {
 
         referenceRestClient = new RESTClient(referenceUrl)
         testRestClient = new RESTClient(testUrl)
+
+        log.info("Test: ${specificationContext.currentIteration.name}")
     }
 
     @Shared
