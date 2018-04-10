@@ -50,7 +50,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Body contains proper values"
-        response.data.totalRecords >= 73949280
+        response.data.totalRecords >= 73949280 * 0.98 // 2% margin error from current production data
         response.data.status == "OK"
         response.data.occurrences.size() == 10
         !response.data.facetResults
@@ -72,7 +72,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Total records is at least 148019"
-        response.data.totalRecords >= 148019
+        response.data.totalRecords >= 148019 * 0.98 // 2% margin error from current production data
 
         and: "All species occurrences on first page are Macropus"
         response.data.occurrences.findAll {it.scientificName.contains("Macropus")}.size() == response.data.occurrences.size()
@@ -102,7 +102,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Total records is at least 266109"
-        response.data.totalRecords >= 266109
+        response.data.totalRecords >= 266109 * 0.98 // 2% margin error from current production data
 
         and: "Some species occurrences on first page are macropus"
         response.data.occurrences.findAll {it.scientificName?.toLowerCase()?.contains("macropus")}.size() > 0
@@ -115,22 +115,22 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains kingdom Animalia"
         def animaliaKingdom = kingdomFacet.find {it.label == "Animalia"}
         animaliaKingdom != null
-        animaliaKingdom.count >= 264515
+        animaliaKingdom.count >= 264515 * 0.98 // 2% margin error from current production data
 
         and: "also has some  Fungi kingdom"
         def fungiKingdom = kingdomFacet.find {it.label == "Fungi"}
         fungiKingdom != null
-        fungiKingdom.count >= 10
+        fungiKingdom.count >= 10 * 0.98 // 2% margin error from current production data
 
         and: "also has some  Plantae kingdom"
         def plantaeKingdom = kingdomFacet.find {it.label == "Plantae"}
         plantaeKingdom != null
-        plantaeKingdom.count >= 327
+        plantaeKingdom.count >= 327 * 0.98 // 2% margin error from current production data
 
         and: "the remaining kingdom is unknown"
         def unknownKingdom = kingdomFacet.find {it.label == ""}
         unknownKingdom != null
-        unknownKingdom.count >= 1257
+        unknownKingdom.count >= 1257 * 0.98 // 2% margin error from current production data
 
         and: "queryTitle is text:Macropus"
         response.data.queryTitle == "text:Macropus"
@@ -149,7 +149,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Total records is at least 333"
-        response.data.totalRecords >= 333
+        response.data.totalRecords >= 333 * 0.98 // 2% margin error from current production data
 
         and: "All species occurrences on first page are Osphranter rufus"
         response.data.occurrences.findAll {it.scientificName?.contains("Osphranter rufus") || it.scientificName?.contains("Macropus")}.size() == response.data.occurrences.size()
@@ -165,12 +165,12 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains taxon Macropus"
         def animaliaKingdom = taxonNameFacet.find {it.label == "Macropus"}
         animaliaKingdom != null
-        animaliaKingdom.count >= 91
+        animaliaKingdom.count >= 91 * 0.98 // 2% margin error from current production data
 
         and: "also has taxon Osphranter rufus"
         def fungiKingdom = taxonNameFacet.find {it.label == "Osphranter rufus"}
         fungiKingdom != null
-        fungiKingdom.count >= 242
+        fungiKingdom.count >= 242 * 0.98 // 2% margin error from current production data
 
 
         and: "queryTitle is raw_name:\"Osphranter rufus\""
@@ -190,7 +190,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Total records is at least 25,719"
-        response.data.totalRecords >= 25719
+        response.data.totalRecords >= 25719 * 0.98 // 2% margin error from current production data
 
         and: "Some vernacular name occurrences on first page are 'silver wattle'"
         response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
@@ -221,7 +221,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains taxon  'Acacia dealbata subsp. dealbata'"
         def subspDealbata = taxonNameFacet.find {it.label == "Acacia dealbata subsp. dealbata"}
         subspDealbata != null
-        subspDealbata.count >= 9877
+        subspDealbata.count >= 9877 * 0.98 // 2% margin error from current production data
 
         and: "queryTitle is raw_name:\"Acacia dealbata\""
         response.data.queryTitle == "raw_name:\"Acacia dealbata\""
@@ -241,7 +241,7 @@ class OcurrenceSearchTest extends Specification {
         response.status == 200
 
         and: "Total records is at least 2713131"
-        response.data.totalRecords >= 2713131
+        response.data.totalRecords >= 2713131 * 0.98 // 2% margin error from current production data
 
         and: "Has 1 kingdom"
         def kingdomFacet = response.data.facetResults.find {it.fieldName == "kingdom"}?.fieldResult
@@ -251,7 +251,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains kingdom Animalia"
         def animaliaKingdom = kingdomFacet.find {it.label == "Animalia"}
         animaliaKingdom != null
-        animaliaKingdom.count >= 2713131
+        animaliaKingdom.count >= 2713131 * 0.98 // 2% margin error from current production data
 
         and: "Has 1 phylum"
         def phylumFacet = response.data.facetResults.find {it.fieldName == "phylum"}?.fieldResult
@@ -261,7 +261,7 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains phylum Chordata"
         def chordataPhylum = phylumFacet.find {it.label == "Chordata"}
         chordataPhylum != null
-        chordataPhylum.count >= 2713131
+        chordataPhylum.count >= 2713131 * 0.98 // 2% margin error from current production data
 
         and: "Has 2 classes"
         def classFacet = response.data.facetResults.find {it.fieldName == "class"}?.fieldResult
@@ -271,14 +271,62 @@ class OcurrenceSearchTest extends Specification {
         and: "Contains class Mammalia"
         def mammaliaClass = classFacet.find {it.label == "Mammalia"}
         mammaliaClass != null
-        mammaliaClass.count >= 2255099
+        mammaliaClass.count >= 2255099 * 0.98 // 2% margin error from current production data
 
         and: "the remaining class is unknown"
         def unknownKingdom = classFacet.find {it.label == ""}
         unknownKingdom != null
-        unknownKingdom.count >= 458032
+        unknownKingdom.count >= 458032 * 0.98 // 2% margin error from current production data
 
         and: "queryTitle is Lifeform:Mammals"
         response.data.queryTitle == "Lifeform:Mammals"
     }
+
+//    def "Search for the Australian Museum Entomology Collection should mostly show class Insecta, kingdom Animalia etc. There will be some errors as stuff like Genus nov. gets mismatched and some molluscs and other oddities."() {
+//
+//        String queryString = "q=text%3AMacropus&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name&facets=genus&facets=kingdom"
+//        when: "Search Text Macropus"
+//        def response = restClient.get(
+//                path: path,
+//                queryString: queryString
+//        )
+//
+//        then: "Status is 200"
+//        response.status == 200
+//
+//        and: "Total records is at least 266109"
+//        response.data.totalRecords >= 266109 * 0.98 // 2% margin error from current production data
+//
+//        and: "Some species occurrences on first page are macropus"
+//        response.data.occurrences.findAll {it.scientificName?.toLowerCase()?.contains("macropus")}.size() > 0
+//
+//        and: "Has 4 Kingdoms"
+//        def kingdomFacet = response.data.facetResults.find {it.fieldName == "kingdom"}?.fieldResult
+//        kingdomFacet != null
+//        kingdomFacet.size() == 4
+//
+//        and: "Contains kingdom Animalia"
+//        def animaliaKingdom = kingdomFacet.find {it.label == "Animalia"}
+//        animaliaKingdom != null
+//        animaliaKingdom.count >= 264515 * 0.98 // 2% margin error from current production data
+//
+//        and: "also has some  Fungi kingdom"
+//        def fungiKingdom = kingdomFacet.find {it.label == "Fungi"}
+//        fungiKingdom != null
+//        fungiKingdom.count >= 10
+//
+//        and: "also has some  Plantae kingdom"
+//        def plantaeKingdom = kingdomFacet.find {it.label == "Plantae"}
+//        plantaeKingdom != null
+//        plantaeKingdom.count >= 327
+//
+//        and: "the remaining kingdom is unknown"
+//        def unknownKingdom = kingdomFacet.find {it.label == ""}
+//        unknownKingdom != null
+//        unknownKingdom.count >= 1257
+//
+//        and: "queryTitle is text:Macropus"
+//        response.data.queryTitle == "text:Macropus"
+//    }
+
 }
