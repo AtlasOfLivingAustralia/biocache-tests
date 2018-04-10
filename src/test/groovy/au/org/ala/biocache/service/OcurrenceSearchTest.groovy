@@ -18,14 +18,19 @@ package  au.org.ala.biocache.service
 import au.org.ala.test.spock.EnvironmentEndPoint
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
-import spock.lang.Shared
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 /**
  * Functional test for Occurrence Search
  * @author "Javier Molina <javier-molina at GH>"
  */
+//@Slf4j
 class OcurrenceSearchTest extends Specification {
+
+    /* https://github.com/spockframework/spock/issues/491 */
+    final static Logger log = LoggerFactory.getLogger(OcurrenceSearchTest.class)
 
     @EnvironmentEndPoint
     String baseUrl
@@ -36,6 +41,7 @@ class OcurrenceSearchTest extends Specification {
     def setup() {
 //        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
         restClient = new RESTClient(baseUrl, ContentType.JSON)
+
     }
 
     def "Search all records"() {
@@ -45,6 +51,8 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString,
         )
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200
@@ -67,6 +75,8 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString
         )
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200
@@ -97,6 +107,7 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString
         )
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200
@@ -144,6 +155,7 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString
         )
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200
@@ -185,6 +197,7 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString
         )
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200
@@ -236,6 +249,7 @@ class OcurrenceSearchTest extends Specification {
                 path: path,
                 queryString: queryString
         )
+        log.info("Testing [${baseUrl}$path?$queryString] ")
 
         then: "Status is 200"
         response.status == 200

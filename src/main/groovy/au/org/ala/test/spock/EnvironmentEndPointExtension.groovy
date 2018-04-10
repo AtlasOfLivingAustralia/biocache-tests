@@ -14,6 +14,7 @@
  */
 package au.org.ala.test.spock
 
+import groovy.util.logging.Slf4j
 import org.spockframework.runtime.extension.AbstractAnnotationDrivenExtension
 import org.spockframework.runtime.extension.AbstractMethodInterceptor
 import org.spockframework.runtime.extension.IMethodInvocation
@@ -24,7 +25,7 @@ import org.spockframework.runtime.model.SpecInfo
  * Spock Environment Annotation Extension
  * @author "Javier Molina <javier-molina at GH>"
  */
-//@Slf4j
+@Slf4j
 class EnvironmentEndPointExtension extends AbstractAnnotationDrivenExtension<EnvironmentEndPoint> {
 
 //    private static def config = new ConfigSlurper().parse(new File('src/test/resources/SpockConfig.groovy').toURL())
@@ -47,9 +48,9 @@ class EnvironmentEndPointExtension extends AbstractAnnotationDrivenExtension<Env
     void visitFieldAnnotation(EnvironmentEndPoint annotation, FieldInfo field) {
         String envString = System.getProperties().getProperty(annotation.envVariable());
         if(!envString) {
-            println("Warning: property ${annotation.envVariable()} not set while running test suite. Most likely tests will fail." )
+            log.warn("Property ${annotation.envVariable()} not set while running test suite. Most likely tests will fail." )
         } else {
-            println("Using ${annotation.envVariable()} property with value ${envString}." )
+            log.info("Using ${annotation.envVariable()} property with value ${envString}." )
         }
 
         def interceptor = new EnvironmentInterceptor(field, envString)

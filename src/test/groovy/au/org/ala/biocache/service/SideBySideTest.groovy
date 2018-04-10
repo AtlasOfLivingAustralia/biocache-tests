@@ -18,6 +18,8 @@ import au.org.ala.test.ContentTypeUtil
 import au.org.ala.test.SpreadSheetUtil
 import au.org.ala.test.spock.EnvironmentEndPoint
 import groovyx.net.http.RESTClient
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -30,16 +32,19 @@ import spock.lang.Unroll
  * comparisson would not make sense
  * @author "Javier Molina <javier-molina at GH>"
  */
+//@Slf4j
 class SideBySideTest extends Specification {
 
+    /* https://github.com/spockframework/spock/issues/491 */
+    final static Logger log = LoggerFactory.getLogger(SideBySideTest.class)
 
     // System under test
     @EnvironmentEndPoint
-    String testUrl //= "https://devt.ala.org.au/biocache-service/ws/"
+    String testUrl
 
     // Reference system
     @EnvironmentEndPoint(envVariable = "referenceHostUrl")
-    String referenceUrl //= "https://biocache-test.ala.org.au/ws/"
+    String referenceUrl
 
     RESTClient referenceRestClient
     RESTClient testRestClient
@@ -63,6 +68,8 @@ class SideBySideTest extends Specification {
                 [path: path,
                  queryString: queryString]
 
+        log.info("Comparing [${testUrl}$path?$queryString] to [${referenceUrl}$path?$queryString]")
+
         if(contentType) {
             referenceRequestParams.contentType = contentType
         }
@@ -84,9 +91,9 @@ class SideBySideTest extends Specification {
 
         and: "Data is equal for both systems"
         if(referenceResponse.data instanceof InputStream) {
-            referenceResponse.data.getBytes() == testResponse.data.getBytes()
+            assert referenceResponse.data.getBytes() == testResponse.data.getBytes()
         } else {
-            referenceResponse.data == testResponse.data
+            assert referenceResponse.data == testResponse.data
         }
 
         where:
