@@ -93,9 +93,11 @@ class SideBySideTest extends Specification {
 
         and: "Data is equal for both systems"
         if(referenceResponse.data instanceof InputStream) {
-            assert referenceResponse.data.getBytes() == testResponse.data.getBytes()
+            assert testResponse.data.getBytes() == referenceResponse.data.getBytes()
+        } else if (referenceResponse.data instanceof java.io.StringReader) {
+            assert testResponse.data.getText() == referenceResponse.data.getText()
         } else {
-            assert referenceResponse.data == testResponse.data
+            assert testResponse.data == referenceResponse.data
         }
 
         where:
