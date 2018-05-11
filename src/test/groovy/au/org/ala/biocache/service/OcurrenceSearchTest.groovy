@@ -192,7 +192,7 @@ class OcurrenceSearchTest extends Specification {
 
     def "Search for Raw/Provided Scientific Name 'Acacia dealbata' should turn up assorted silver wattles"() {
 
-        String queryString  = "q=raw_name%3A%22Acacia%20dealbata%22&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
+        String queryString  = "q=raw_name%3A%22Acacia%20dealbata%22&start=0&pageSize=50&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
         when: "Search for Raw/Provided Scientific Name 'Acacia dealbata'"
         def response = restClient.get(
                 path: path,
@@ -207,9 +207,6 @@ class OcurrenceSearchTest extends Specification {
         response.data.totalRecords >= 25719 * 0.98 // 2% margin error from current production data
 
         and: "Some vernacular name occurrences on first page are 'silver wattle'"
-        response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
-
-        and: "Some raw vernacular name occurrences on first page are 'silver wattle'"
         response.data.occurrences.findAll {it.raw_vernacularName?.toLowerCase() =~ /silver.*wattle/}.size() > 0
 
         when: "Drill down on occurrences"
