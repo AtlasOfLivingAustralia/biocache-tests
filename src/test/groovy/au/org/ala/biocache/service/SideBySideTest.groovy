@@ -52,7 +52,9 @@ class SideBySideTest extends Specification {
     def setup() {
         //Uncomment and adjust, the two lines below for testing a single method test from the IDE
 //        testUrl = "https://devt.ala.org.au/biocache-service/ws/"
-//        referenceUrl = "https://biocache-test.ala.org.au/ws/"
+//        testUrl = "https://biocache-test.ala.org.au/ws/"
+//        referenceUrl = "https://biocache.ala.org.au/ws/"
+//        referenceUrl = "https://devt.ala.org.au/biocache-service/ws/"
 
         referenceRestClient = new RESTClient(referenceUrl)
         testRestClient = new RESTClient(testUrl)
@@ -95,7 +97,13 @@ class SideBySideTest extends Specification {
         if(referenceResponse.data instanceof InputStream) {
             assert testResponse.data.getBytes() == referenceResponse.data.getBytes()
         } else if (referenceResponse.data instanceof java.io.StringReader) {
-            assert testResponse.data.getText() == referenceResponse.data.getText()
+
+            final String HOMOGENOUS_HREF = 'xlink:href="homogenusHref/'
+            String testData = testResponse.data.getText()
+            String referenceData = referenceResponse.data.getText()
+
+            assert testData.replace('xlink:href="' + testUrl, HOMOGENOUS_HREF).replace('xlink:href="http://biocache.ala.org.au/ws/', HOMOGENOUS_HREF) ==
+                   referenceData.replace('xlink:href="' + referenceUrl, HOMOGENOUS_HREF).replace('xlink:href="http://biocache.ala.org.au/ws/', HOMOGENOUS_HREF)
         } else {
             assert testResponse.data == referenceResponse.data
         }
