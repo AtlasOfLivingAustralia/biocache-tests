@@ -22,6 +22,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
+import javax.imageio.ImageIO
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+
 /**
  * Functional tests for different services accross biocache-service
  * @author "Javier Molina <javier-molina at GH>"
@@ -38,21 +42,33 @@ class AssortedServicesTest extends Specification {
     RESTClient restClient
 
     def setup() {
+//        baseUrl = "https://biocache-test.ala.org.au/ws/" //Uncomment and adjust for testing a single method test from the IDE
+//        baseUrl = "https://biocache.ala.org.au/ws/" //Uncomment and adjust for testing a single method test from the IDE
 //        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
         restClient = new RESTClient(baseUrl, ContentType.JSON)
         log.info("Test: ${specificationContext.currentIteration.name}")
 
     }
 
+    private ArrayList<String> fileNamesInArchive(InputStream is) {
+        List<String> files = []
+        ZipInputStream zi = new ZipInputStream(is)
+        ZipEntry entry
+        while ((entry = zi.getNextEntry()) != null) {
+            files << entry.name
+        }
+        return files
+    }
+
     def "Get an specific occurrence 794e1d5b-fc14-4b77-a21a-8e73749dc910"() {
         String path = "occurrences/794e1d5b-fc14-4b77-a21a-8e73749dc910"
+
+        log.info("Testing [${baseUrl}$path] ")
 
         when: "Get occurrence"
         def response = restClient.get(
                 path: path,
         )
-
-        log.info("Testing [${baseUrl}$path] ")
 
         then: "Status is 200"
         response.status == 200
@@ -74,6 +90,235 @@ class AssortedServicesTest extends Specification {
 
         and: "Passed assertions >= 29"
         response.data.systemAssertions.passed.size() >= 29
+
+    }
+
+    def "Get Static map for the red kangaroo"() {
+        String path = "density/map"
+        String queryString = "q=Macropus+rufus"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a PNG image"
+        response.contentType == "image/png"
+        ImageIO.read(response.data) != null
+
+
+        and: "It is at least 66KB in size"
+        response.data.buf.length >= 66000
+
+    }
+
+    def "Download Macropus rufus static map"() {
+        String path = "mapping/wms/image"
+        String queryString = "pradiusmm=1&extents=96.173828125,-47.11468820158343,169.826171875,-2.5694811631203973&scale=on&outline=true&fileName=MyMap.jpg&pcolour=3531FF&outlineColour=0x000000&q=Macropus+rufus&dpi=300&format=jpg&baselayer=world&popacity=1"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+
+        response.contentType == "application/octet-stream"
+
+        and: "It is at least 52KB in size"
+        response.data.buf.length >= 52000
+
+        and: "It's an image"
+        ImageIO.read(response.data) != null
+
+    }
+
+    def "Scatterplot example (Example for Macropus Rufus and environmental layers Temperature - annual mean (Bio01) and Precipitation - annual (bio12))"() {
+        String path = "scatterplot"
+        String queryString = "q=Macropus%20Agilis&y=el893&x=el874&pointradius=2&height=512&pointcolour=FF0000&width=512"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a PNG image"
+        response.contentType == "image/png"
+        ImageIO.read(response.data) != null
+
+
+        and: "It is at least 21KB in size"
+        response.data.buf.length >= 21000
+
+    }
+
+    def "An example showing 2 layers for 2 separate species overlaid on the same map using leafletjs."() {
+        String path = "ogc/wms/reflect"
+
+        log.info("Testing [${baseUrl}$path] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a PNG image"
+        response.contentType == "image/png"
+        ImageIO.read(response.data) != null
+
+
+        and: "It is at least 415 in size"
+        response.data.buf.length >= 415
+
+    }
+
+    def "Download all Acacia abbatiana records  with all the default fields and all record issues specifying a \"testing\" reason for the download."() {
+        String path = "occurrences/index/download"
+        String queryString = "q=Acacia+abbatiana&reasonTypeId=10"
+
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a ZIP file"
+        response.contentType == "application/zip"
+
+        and: "It is at least 3.5KB in size"
+        response.data.buf.length >= 3500
+
+        and: "Zip file contains the expected files"
+        ArrayList<String> files = fileNamesInArchive(response.data)
+        !files.isEmpty()
+        files.contains("citation.csv")
+        files.contains("data.csv")
+        files.contains("headings.csv")
+        files.contains("README.html")
+
+    }
+
+    def "Shape File Download for genus Macropus agilis"() {
+        String path = "occurrences/index/download"
+        String queryString = "q=Macropus+agilis&reasonTypeId=10&fileType=shp"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a ZIP file"
+        response.contentType == "application/zip"
+
+        and: "It is at least 1.6MB in size"
+        response.data.buf.length >= 1600000
+
+        and: "Zip file contains the expected files"
+        ArrayList<String> files = fileNamesInArchive(response.data)
+        !files.isEmpty()
+        files.contains("citation.csv")
+        files.contains("data.csv")
+        files.contains("headings.csv")
+        files.contains("README.html")
+        files.contains("data.zip")
+        files.contains("Shape-README.html")
+
+    }
+
+    def "Disable Record Issues in download"() {
+        String path = "occurrences/index/download"
+        String queryString = "q=genus:Dugong&reasonTypeId=10&qa=none"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a ZIP file"
+        response.contentType == "application/zip"
+
+        and: "It is at least 48KB in size"
+        response.data.buf.length >= 48000
+
+        and: "Zip file contains the expected files"
+        ArrayList<String> files = fileNamesInArchive(response.data)
+        !files.isEmpty()
+        files.contains("citation.csv")
+        files.contains("data.csv")
+        files.contains("headings.csv")
+        files.contains("README.html")
+
+    }
+
+
+    def "Download E.gunnii lats and longs"() {
+        String path = "occurrences/index/download"
+        String queryString = "q=genus:Dugong&reasonTypeId=10&qa=none"
+
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+        when: "Get occurrence"
+        def response = restClient.get(
+                path: path,
+                queryString: queryString,
+                contentType: "application/octet-stream"
+        )
+
+        then: "Status is 200"
+        response.status == 200
+
+        and: "It's a ZIP file"
+        response.contentType == "application/zip"
+
+        and: "It is at least 2.4KB in size"
+        response.data.buf.length >= 2400
+
+        and: "Zip file contains the expected files"
+        ArrayList<String> files = fileNamesInArchive(response.data)
+        !files.isEmpty()
+        files.contains("citation.csv")
+        files.contains("data.csv")
+        files.contains("headings.csv")
+        files.contains("README.html")
 
     }
 }

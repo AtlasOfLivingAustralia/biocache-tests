@@ -54,6 +54,7 @@ class SideBySideTest extends Specification {
 //        testUrl = "https://devt.ala.org.au/biocache-service/ws/"
 //        testUrl = "https://biocache-test.ala.org.au/ws/"
 //        referenceUrl = "https://biocache.ala.org.au/ws/"
+//        referenceUrl = "https://biocache-test.ala.org.au/ws/"
 //        referenceUrl = "https://devt.ala.org.au/biocache-service/ws/"
 
         referenceRestClient = new RESTClient(referenceUrl)
