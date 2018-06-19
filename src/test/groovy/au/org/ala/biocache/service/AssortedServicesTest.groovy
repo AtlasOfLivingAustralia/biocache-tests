@@ -44,6 +44,7 @@ class AssortedServicesTest extends Specification {
     def setup() {
 //        baseUrl = "https://biocache-test.ala.org.au/ws/" //Uncomment and adjust for testing a single method test from the IDE
 //        baseUrl = "https://biocache.ala.org.au/ws/" //Uncomment and adjust for testing a single method test from the IDE
+//        baseUrl = "https://biocache-clustered.ala.org.au/ws/" //Uncomment and adjust for testing a single method test from the IDE
 //        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
         restClient = new RESTClient(baseUrl, ContentType.JSON)
         log.info("Test: ${specificationContext.currentIteration.name}")
@@ -171,13 +172,16 @@ class AssortedServicesTest extends Specification {
 
     }
 
-    def "An example showing 2 layers for 2 separate species overlaid on the same map using leafletjs."() {
+    def "An example showing layers."() {
         String path = "ogc/wms/reflect"
+        String queryString = "service=WMS&version=1.1.0&request=GetMap&styles=&format=image/png&layers=ALA:occurrences&transparent=true&CACHE=on&CQL_FILTER=qid:1514883477341&SRS=EPSG%3A3857&ENV=color%253Aff0000%253Bname%253Acircle%253Bsize%253A4%253Buncertainty%253A1%253Bopacity%253A1&BBOX=15393194.842039,-4238280.0037665,15393806.338265,-4237668.5075403&WIDTH=256&HEIGHT=256"
 
-        log.info("Testing [${baseUrl}$path] ")
+        log.info("Testing [${baseUrl}$path?$queryString] ")
+
         when: "Get occurrence"
         def response = restClient.get(
                 path: path,
+                queryString: queryString,
                 contentType: "application/octet-stream"
         )
 
@@ -190,7 +194,7 @@ class AssortedServicesTest extends Specification {
 
 
         and: "It is at least 415 in size"
-        response.data.buf.length >= 415
+        response.data.buf.length >= 1500
 
     }
 
