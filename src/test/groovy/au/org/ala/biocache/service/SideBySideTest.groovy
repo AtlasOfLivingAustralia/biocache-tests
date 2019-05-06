@@ -52,9 +52,9 @@ class SideBySideTest extends Specification {
     def setup() {
         //Uncomment and adjust, the two lines below for testing a single method test from the IDE
 //        testUrl = "https://devt.ala.org.au/biocache-service/ws/"
-//        testUrl = "https://biocache-test.ala.org.au/ws/"
-//        referenceUrl = "https://biocache.ala.org.au/ws/"
-//        referenceUrl = "https://biocache-test.ala.org.au/ws/"
+//        testUrl = "https://biocache-ws-test.ala.org.au/ws/"
+//        referenceUrl = "https://biocache-ws.ala.org.au/ws/"
+//        referenceUrl = "https://biocache-ws-test.ala.org.au/ws/"
 //        referenceUrl = "https://devt.ala.org.au/biocache-service/ws/"
 
         referenceRestClient = new RESTClient(referenceUrl)
