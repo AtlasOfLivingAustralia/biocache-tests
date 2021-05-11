@@ -5,7 +5,7 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 
 class OcurrenceSearchSpec extends spock.lang.Specification {
-    @EnvironmentEndPoint
+    @EnvironmentEndPoint(envVariable = "testHostUrl")
     String baseUrl
 
     RESTClient restClient
@@ -13,7 +13,6 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
 
     def setup() {
 //        baseUrl = "https://devt.ala.org.au/biocache-service/ws/" //Uncomment and adjust for testing a single method test from the IDE
-        baseUrl = "https://biocache-test.ala.org.au/ws/"
         restClient = new RESTClient(baseUrl, ContentType.JSON)
         println(("Setup preparation for: ${specificationContext.currentIteration.name}"))
     }
