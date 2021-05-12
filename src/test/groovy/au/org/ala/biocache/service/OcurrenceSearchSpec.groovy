@@ -158,11 +158,11 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
             animaliaKingdom.count >= 264515 * 0.98 // 2% margin error from current production data
             println("and contains kingdom Animalia")
 
-            and: "also has some Fungi Kingdom"
+            and: "also has some Fungi Kingdoms"
             def fungiKingdom = kingdomFacet.find { it.label == "Fungi" }
             fungiKingdom != null
             fungiKingdom.count >= 10 * 0.98 // 2% margin error from current production data
-            println("and also has some Fungi Kingdom")
+            println("and also has some Fungi Kingdoms")
 
             and: "also has some Plantae Kingdom"
             def plantaeKingdom = kingdomFacet.find { it.label == "Plantae" }
@@ -206,7 +206,7 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
             def taxonNameFacet = facetResults.find { it.fieldName == "taxon_name" }?.fieldResult
             taxonNameFacet != null
             taxonNameFacet.size() == 2
-            println("and has two Taxon")
+            println("and has two Taxons")
 
             and: "Contains Taxon Macropus"
             def animaliaKingdom = taxonNameFacet.find { it.label == "Macropus" }
@@ -263,7 +263,7 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         def taxonNameFacet = response.data.facetResults.find {it.fieldName == "taxon_name"}?.fieldResult
         taxonNameFacet != null
         taxonNameFacet.size() >= 8
-        println("and has at least eight Taxon")
+        println("and has at least eight Taxons")
 
         and: "Contains Taxon 'Acacia dealbata subsp. dealbata'"
         def subspDealbata = taxonNameFacet.find {it.label == "Acacia dealbata subsp. dealbata"}
@@ -299,7 +299,7 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
             def kingdomFacet = facetResults.find { it.fieldName == "kingdom" }?.fieldResult
             kingdomFacet != null
             kingdomFacet.size() == 1
-            println("and had one Kingdom")
+            println("and has one Kingdom")
 
             and: "Contains Kingdom Animalia"
             def animaliaKingdom = kingdomFacet.find { it.label == "Animalia" }
@@ -385,7 +385,7 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
 
             and: "queryTitle is text:Macropus"
             queryTitle == "text:Macropus"
-            println("Then: response status is: ${response.status}")
+            println("and has correct query title: ${response.data.queryTitle}")
         }
     }
 }
