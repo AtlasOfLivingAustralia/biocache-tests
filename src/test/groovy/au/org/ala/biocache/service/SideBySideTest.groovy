@@ -20,6 +20,7 @@ import au.org.ala.test.spock.EnvironmentEndPoint
 import groovyx.net.http.RESTClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -33,6 +34,7 @@ import spock.lang.Unroll
  * @author "Javier Molina <javier-molina at GH>"
  */
 //@Slf4j
+@Ignore
 class SideBySideTest extends Specification {
 
     /* https://github.com/spockframework/spock/issues/491 */

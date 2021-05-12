@@ -20,6 +20,7 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -27,6 +28,7 @@ import spock.lang.Specification
  * @author "Javier Molina <javier-molina at GH>"
  */
 //@Slf4j
+@Ignore
 class OcurrenceSearchTest extends Specification {
 
     /* https://github.com/spockframework/spock/issues/491 */

@@ -20,6 +20,7 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import javax.imageio.ImageIO
@@ -31,6 +32,7 @@ import java.util.zip.ZipInputStream
  * @author "Javier Molina <javier-molina at GH>"
  */
 //@Slf4j
+@Ignore
 class AssortedServicesTest extends Specification {
 
     /* https://github.com/spockframework/spock/issues/491 */
