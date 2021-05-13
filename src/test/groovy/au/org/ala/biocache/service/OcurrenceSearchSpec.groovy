@@ -74,20 +74,25 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         println("Then: response status is: ${response.status}")
 
         and: "occurrences[0] contains proper structure"
-        println("and checking some occurrences[0] fields:")
+        println("and checking some occurrences[0] fields, all but uuid is optional:")
         with(response.data.occurrences[0]) {
             uuid
             println("occurrences[0] contains uuid: ${uuid}")
-            occurrenceID
-            println("occurrences[0] contains occurrenceID: ${occurrenceID}")
-            taxonConceptID
-            println("occurrences[0] contains taxonConceptID: ${taxonConceptID}")
-            scientificName
-            println("occurrences[0] contains scientificName: ${scientificName}")
-            dataProviderUid
-            println("occurrences[0] contains dataProviderUid: ${dataProviderUid}")
-            dataResourceUid
-            println("occurrences[0] contains dataResourceUid: ${dataResourceUid}")
+            if (occurrenceID) {
+                println("occurrences[0] contains occurrenceID: ${occurrenceID}")
+            }
+            if (taxonConceptID) {
+                println("occurrences[0] contains taxonConceptID: ${taxonConceptID}")
+            }
+            if (scientificName) {
+                println("occurrences[0] contains scientificName: ${scientificName}")
+            }
+            if (dataProviderUid) {
+                println("occurrences[0] contains dataProviderUid: ${dataProviderUid}")
+            }
+            if (dataResourceUid) {
+                println("occurrences[0] contains dataResourceUid: ${dataResourceUid}")
+            }
         }
     }
 
