@@ -3,7 +3,7 @@
 **biocache-tests** is a Groovy/Spock project that seeks to gather all functional (integration) tests that will be used to perform a sanity chcek for an environment.
 
 At this stage this project is focused on the [Biocache Service section from the Biocache Infrastructure Testing Plan 2018](https://wiki.ala.org.au/wiki/Biocache-Infrastructure-Testing-Plan-2018)
-
+and https://github.com/AtlasOfLivingAustralia/bie-index/wiki/Things-to-check-for-a-new-bie-index#biocache
 ## Usage
 A typical invocation of the tests will look like the line below
 
@@ -15,5 +15,5 @@ Where:
 
 ## TODO
 * Implement a look up to translate ala-hub taxa=XYZ query to biocache 
-* Hook to a Jenkins job for a particular environment
+* Implement a look up table/file for expected results in different environments
 
