@@ -9,9 +9,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 class AssortedServicesSpec extends spock.lang.Specification {
-    private static final String APIKEY_TEST = "9404957c-bd30-44f5-a501-107e0b4e581e"
-    private static final String APIKEY_PROD = "b60aab2c-911e-4695-9859-ea9ef428120a"
-
     @EnvironmentEndPoint(envVariable = "testHostUrl")
     String baseUrl
 
