@@ -15,16 +15,21 @@ class AssortedServicesSpec extends spock.lang.Specification {
     @EnvironmentEndPoint(envVariable = "testHostUrl")
     String baseUrl
 
+    @EnvironmentEndPoint(envVariable = "apiKeyTest")
+    String apiKeyTest
+
+    @EnvironmentEndPoint(envVariable = "apiKeyProd")
+    String apiKeyProd
+
     RESTClient restClient
 
     private String apiKey
 
     def setup() {
-//        baseUrl = "https://biocache-test.ala.org.au/ws/"
         if (baseUrl == "https://biocache-test.ala.org.au/ws/"){
-            apiKey = APIKEY_TEST
+            apiKey = apiKeyTest
         } else if (baseUrl == "https://biocache.ala.org.au/ws/"){
-            apiKey = APIKEY_PROD
+            apiKey = apiKeyProd
         } else {
             println("No apiKey available for downloading, some tests will fail.")
         }
