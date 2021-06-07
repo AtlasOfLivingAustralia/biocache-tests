@@ -61,17 +61,17 @@ class AssortedServicesSpec extends spock.lang.Specification {
             raw.classification.vernacularName == "Willie Wagtail"
             println("and vernacularName is 'Willie Wagtail'")
 
-            and: "Unchecked assertions >= 45"
-            systemAssertions.unchecked.size() >= 45
-            println("and unchecked assertions >= 45")
+            and: "Unchecked assertions >= 26"
+            systemAssertions.unchecked.size() >= 26
+            println("and unchecked assertions >= 26")
 
-            and: "Warning assertions >= 3"
-            systemAssertions.warning.size() >= 3
-            println("and warning assertions >= 3")
+            and: "Warning assertions >= 4"
+            systemAssertions.warning.size() >= 4
+            println("and warning assertions >= 4")
 
-            and: "Passed assertions >= 28"
-            systemAssertions.passed.size() >= 28
-            println("and passed assertions >= 28")
+            and: "Passed assertions >= 70"
+            systemAssertions.passed.size() >= 70
+            println("and passed assertions >= 70")
         }
     }
 
@@ -96,9 +96,9 @@ class AssortedServicesSpec extends spock.lang.Specification {
         ImageIO.read(response.data) != null
         println("and it's a PNG image")
 
-        and: "It is at least 66KB in size"
-        response.data.buf.length >= 66000
-        println("and it is at least 66KB in size")
+        and: "It is an valid image ( size > 0) "
+        response.data.buf.length >= 1
+        println("and it is at least 1KB in size")
     }
 
     def "Download Macropus rufus static map"() {

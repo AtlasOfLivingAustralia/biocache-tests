@@ -125,7 +125,8 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         println("and all genus are Macropus")
 
         and: "queryTitle is GENUS: Macropus"
-        response.data.queryTitle == "<span class='lsid' id='urn:lsid:biodiversity.org.au:afd.taxon:b1d9bf29-648f-47e6-8544-2c2fbdf632b1'>GENUS: Macropus</span>"
+        response.data.queryTitle.indexOf("<span class='lsid' id='urn:lsid:biodiversity.org.au:afd.taxon:b1d9bf29-648f-47e6-8544-2c2fbdf632b1'>") != -1
+        response.data.queryTitle.toLowerCase().indexOf("GENUS: Macropus".toLowerCase()) != -1
         println("and has correct query title: ${response.data.queryTitle}")
     }
 
@@ -143,37 +144,25 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         println("Then: response status is: ${response.status}")
 
         with (response.data) {
-            and: "Total records is at least 266109"
-            totalRecords >= 266109 * 0.98 // 2% margin error from current production data
+            and: "Total records is at least 183228"
+            totalRecords >= 183228 * 0.98 // 2% margin error from current test data
             println("and total records is at least 266109")
 
             and: "Some species occurrences on first page are macropus"
             occurrences.findAll { it.scientificName?.toLowerCase()?.contains("macropus") }.size() > 0
             println("and some species occurrences on first page are macropus")
 
-            and: "Has 4 Kingdoms"
+            and: "Has 2 Kingdoms"
             def kingdomFacet = facetResults.find { it.fieldName == "kingdom" }?.fieldResult
             kingdomFacet != null
-            kingdomFacet.size() == 4
-            println("and has four Kingdoms")
+            kingdomFacet.size() == 2
+            println("and has two Kingdoms")
 
             and: "Contains Kingdom Animalia"
             def animaliaKingdom = kingdomFacet.find { it.label == "Animalia" }
             animaliaKingdom != null
-            animaliaKingdom.count >= 264515 * 0.98 // 2% margin error from current production data
+            animaliaKingdom.count >= 182993 * 0.98 // 2% margin error from current production data
             println("and contains kingdom Animalia")
-
-            and: "also has some Fungi Kingdoms"
-            def fungiKingdom = kingdomFacet.find { it.label == "Fungi" }
-            fungiKingdom != null
-            fungiKingdom.count >= 10 * 0.98 // 2% margin error from current production data
-            println("and also has some Fungi Kingdoms")
-
-            and: "also has some Plantae Kingdom"
-            def plantaeKingdom = kingdomFacet.find { it.label == "Plantae" }
-            plantaeKingdom != null
-            plantaeKingdom.count >= 327 * 0.98 // 2% margin error from current production data
-            println("and also has some Plantae Kingdom")
 
             and: "queryTitle is text:Macropus"
             queryTitle == "text:Macropus"
@@ -181,7 +170,7 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         }
     }
 
-    def "Search for Raw/Provided Scientific Name 'Osphranter rufus' should turn up assorted red kangaroos"() {
+    def "Search for Raw/Provided Scientific Name 'Osphranter rufus' should return 0 since raw_name is deprecated"() {
         String queryString = "q=raw_name%3A%22Osphranter%20rufus%22&start=0&pageSize=20&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
         when: "Search for Raw/Provided Scientific Name 'Osphranter rufus'"
         def response = restClient.get(
@@ -195,43 +184,17 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         println("Then: response status is: ${response.status}")
 
         with (response.data) {
-            and: "Total records is at least 333"
-            totalRecords >= 333 * 0.98 // 2% margin error from current production data
-            println("and total records is at least 333")
-
-            and: "All species occurrences on first page are Osphranter rufus"
-            occurrences.findAll { it.scientificName?.contains("Osphranter rufus") || it.scientificName?.contains("Macropus") }.size() == response.data.occurrences.size()
-            println("and all species occurrences on first page are Osphranter rufus")
-
-            and: "Some vernacular name occurrences on first page are 'Red Kangaroo'"
-            occurrences.findAll { it.vernacularName?.contains("Red Kangaroo") }.size() > 0
-            println("and some vernacular name occurrences on first page are 'Red Kangaroo'")
-
-            and: "Has 2 Taxons"
-            def taxonNameFacet = facetResults.find { it.fieldName == "taxon_name" }?.fieldResult
-            taxonNameFacet != null
-            taxonNameFacet.size() == 2
-            println("and has two Taxons")
-
-            and: "Contains Taxon Macropus"
-            def animaliaKingdom = taxonNameFacet.find { it.label == "Macropus" }
-            animaliaKingdom != null
-            animaliaKingdom.count >= 6 * 0.98 // 2% margin error from current production data
-            println("and contains Taxon Macropus")
-
-            and: "also has Taxon Osphranter rufus"
-            def fungiKingdom = taxonNameFacet.find { it.label == "Osphranter rufus" }
-            fungiKingdom != null
-            fungiKingdom.count >= 242 * 0.98 // 2% margin error from current production data
-            println("and also has Taxon Osphranter rufus")
+            and: "Total records is 0" // because raw_name is a deprecated field
+            totalRecords == 0
+            println("and total records is 0")
 
             and: "queryTitle is raw_name:\"Osphranter rufus\""
-            queryTitle == "raw_name:\"Osphranter rufus\""
+            queryTitle == "deprecated_raw_name:\"Osphranter rufus\""
             println("and has correct query title: ${queryTitle}")
         }
     }
 
-    def "Search for Raw/Provided Scientific Name 'Acacia dealbata' is ok"() {
+    def "Search for Raw/Provided Scientific Name 'Acacia dealbata' should return 0 since raw_name is deprecated"() {
         String queryString  = "q=raw_name%3A%22Acacia%20dealbata%22&start=0&pageSize=50&sort=first_loaded_date&dir=desc&qc=&facets=taxon_name"
         when: "Search for Raw/Provided Scientific Name 'Acacia dealbata'"
         def response = restClient.get(
@@ -244,40 +207,12 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         response.status == 200
         println("Then: response status is: ${response.status}")
 
-        and: "Total records is at least 25,719"
-        response.data.totalRecords >= 25719 * 0.98 // 2% margin error from current production data
-        println("and total records is at least 25,719")
+        and: "Total records is 0"
+        response.data.totalRecords == 0
+        println("and total records is 0")
 
-        when: "Drill down on occurrences"
-        def subspDealbataOccurrences = response.data.occurrences.findAll {it.scientificName?.contains("Acacia dealbata")}
-        then: "An occurrence of 'Acacia dealbata' should be present"
-        subspDealbataOccurrences.size() > 0
-        println("and an occurrence of 'Acacia dealbata' should be present")
-
-        and: "linked to the correct Taxon ID"
-        subspDealbataOccurrences.each {
-            String occurrencePath = "occurrence/${it.uuid}"
-            def occurrenceResponse = restClient.get(
-                    path: occurrencePath
-            )
-            occurrenceResponse.data.processed.classification.taxonConceptID == "https://id.biodiversity.org.au/taxon/apni/51286863"
-        }
-        println("and linked to the correct Taxon ID: \"https://id.biodiversity.org.au/taxon/apni/51286863\"")
-
-        and: "Has at least 8 Taxons"
-        def taxonNameFacet = response.data.facetResults.find {it.fieldName == "taxon_name"}?.fieldResult
-        taxonNameFacet != null
-        taxonNameFacet.size() >= 8
-        println("and has at least eight Taxons")
-
-        and: "Contains Taxon 'Acacia dealbata subsp. dealbata'"
-        def subspDealbata = taxonNameFacet.find {it.label == "Acacia dealbata subsp. dealbata"}
-        subspDealbata != null
-        subspDealbata.count >= 9877 * 0.98 // 2% margin error from current production data
-        println("and contains Taxon 'Acacia dealbata subsp. dealbata'")
-
-        and: "queryTitle is raw_name:\"Acacia dealbata\""
-        response.data.queryTitle == "raw_name:\"Acacia dealbata\""
+        and: "queryTitle is deprecated_raw_name:\"Acacia dealbata\""
+        response.data.queryTitle == "deprecated_raw_name:\"Acacia dealbata\""
         println("and has correct query title: ${response.data.queryTitle}")
     }
 
@@ -356,37 +291,25 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
         println("Then: response status is: ${response.status}")
 
         with(response.data) {
-            and: "Total records is at least 266,109"
-            totalRecords >= 266109 * 0.98 // 2% margin error from current production data
-            println("and total records is at least 266,109")
+            and: "Total records is at least 183,228"
+            totalRecords >= 183228 * 0.98 // 2% margin error from current test data
+            println("and total records is at least 183,228")
 
             and: "Some species occurrences on first page are macropus"
             occurrences.findAll { it.scientificName?.toLowerCase()?.contains("macropus") }.size() > 0
             println("and some species occurrences on first page are macropus")
 
-            and: "Has 4 Kingdoms"
+            and: "Has 2 Kingdoms"
             def kingdomFacet = facetResults.find { it.fieldName == "kingdom" }?.fieldResult
             kingdomFacet != null
-            kingdomFacet.size() == 4
-            println("and had four Kingdoms")
+            kingdomFacet.size() == 2
+            println("and had two Kingdoms")
 
             and: "Contains Kingdom Animalia"
             def animaliaKingdom = kingdomFacet.find { it.label == "Animalia" }
             animaliaKingdom != null
-            animaliaKingdom.count >= 264515 * 0.98 // 2% margin error from current production data
+            animaliaKingdom.count >= 182993 * 0.98 // 2% margin error from current test data
             println("and contains Kingdom Animalia")
-
-            and: "also has some Fungi Kingdoms"
-            def fungiKingdom = kingdomFacet.find { it.label == "Fungi" }
-            fungiKingdom != null
-            fungiKingdom.count >= 10
-            println("and also has some Fungi Kingdoms")
-
-            and: "also has some Plantae Kingdoms"
-            def plantaeKingdom = kingdomFacet.find { it.label == "Plantae" }
-            plantaeKingdom != null
-            plantaeKingdom.count >= 327
-            println("and also has some Plantae Kingdoms")
 
             and: "queryTitle is text:Macropus"
             queryTitle == "text:Macropus"
