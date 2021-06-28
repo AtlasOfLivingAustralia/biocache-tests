@@ -152,17 +152,29 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
             occurrences.findAll { it.scientificName?.toLowerCase()?.contains("macropus") }.size() > 0
             println("and some species occurrences on first page are macropus")
 
-            and: "Has 2 Kingdoms"
+            and: "Has 4 Kingdoms"
             def kingdomFacet = facetResults.find { it.fieldName == "kingdom" }?.fieldResult
             kingdomFacet != null
-            kingdomFacet.size() == 2
-            println("and has two Kingdoms")
+            kingdomFacet.size() == 4
+            println("and has four Kingdoms")
 
             and: "Contains Kingdom Animalia"
             def animaliaKingdom = kingdomFacet.find { it.label == "Animalia" }
             animaliaKingdom != null
-            animaliaKingdom.count >= 182993 * 0.98 // 2% margin error from current production data
+            animaliaKingdom.count >= 301457 * 0.98 // 2% margin error from current production data
             println("and contains kingdom Animalia")
+
+            and: "also has some Fungi Kingdoms"
+            def fungiKingdom = kingdomFacet.find { it.label == "Fungi" }
+            fungiKingdom != null
+            fungiKingdom.count >= 11 * 0.98 // 2% margin error from current production data
+            println("and also has some Fungi Kingdoms")
+
+            and: "also has some Plantae Kingdom"
+            def plantaeKingdom = kingdomFacet.find { it.label == "Plantae" }
+            plantaeKingdom != null
+            plantaeKingdom.count >= 384 * 0.98 // 2% margin error from current production data
+            println("and also has some Plantae Kingdom")
 
             and: "queryTitle is text:Macropus"
             queryTitle == "text:Macropus"
@@ -299,17 +311,29 @@ class OcurrenceSearchSpec extends spock.lang.Specification {
             occurrences.findAll { it.scientificName?.toLowerCase()?.contains("macropus") }.size() > 0
             println("and some species occurrences on first page are macropus")
 
-            and: "Has 2 Kingdoms"
+            and: "Has 4 Kingdoms"
             def kingdomFacet = facetResults.find { it.fieldName == "kingdom" }?.fieldResult
             kingdomFacet != null
-            kingdomFacet.size() == 2
-            println("and had two Kingdoms")
+            kingdomFacet.size() == 4
+            println("and had four Kingdoms")
 
             and: "Contains Kingdom Animalia"
             def animaliaKingdom = kingdomFacet.find { it.label == "Animalia" }
             animaliaKingdom != null
-            animaliaKingdom.count >= 182993 * 0.98 // 2% margin error from current test data
+            animaliaKingdom.count >= 301762 * 0.98 // 2% margin error from current test data
             println("and contains Kingdom Animalia")
+
+            and: "also has some Fungi Kingdoms"
+            def fungiKingdom = kingdomFacet.find { it.label == "Fungi" }
+            fungiKingdom != null
+            fungiKingdom.count >= 11
+            println("and also has some Fungi Kingdoms")
+
+            and: "also has some Plantae Kingdoms"
+            def plantaeKingdom = kingdomFacet.find { it.label == "Plantae" }
+            plantaeKingdom != null
+            plantaeKingdom.count >= 384
+            println("and also has some Plantae Kingdoms")
 
             and: "queryTitle is text:Macropus"
             queryTitle == "text:Macropus"
