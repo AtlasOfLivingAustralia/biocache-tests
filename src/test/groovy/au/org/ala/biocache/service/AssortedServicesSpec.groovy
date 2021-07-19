@@ -236,7 +236,7 @@ class AssortedServicesSpec extends spock.lang.Specification {
         println("and it is a ZIP file")
 
         and: "It is at least 19000 in size"
-        response.data.buf.length >= 5522
+        response.data.buf.length >= 5518
         println("and the file is at least 19KB in size")
 
         and: "Zip file contains the expected files"
